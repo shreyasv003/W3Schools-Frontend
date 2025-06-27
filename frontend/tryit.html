@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Try it Yourself - W3Schools Clone</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    :root {
+      --background: #ffffff;
+      --text: #000000;
+      --editor-bg: #f4f4f4;
+      --editor-text: #000;
+      --code-tag: #d73a49;
+      --code-attr: #6f42c1;
+      --code-string: #032f62;
+    }
+
+    body.dark {
+      --background: #1e1e1e;
+      --text: #ffffff;
+      --editor-bg: #2d2d2d;
+      --editor-text: #e5e5e5;
+      --code-tag: #ff7b72;
+      --code-attr: #d2a8ff;
+      --code-string: #a5d6ff;
+    }
+
+    .header {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--editor-bg);
+      border-bottom: 1px solid #ccc;
+      height: 48px;
+    }
+    .header .run-btn {
+      background-color: #04AA6D;
+      color: white;
+      padding: 8px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .theme-btn {
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .editor-layout {
+      display: flex;
+      height: calc(100vh - 48px); /* Full height minus header */
+    }
+
+    #editor-panel {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #codeInput {
+      flex-grow: 1;
+      border: none;
+      outline: none;
+      padding: 10px;
+      font-family: 'Consolas', monospace;
+      font-size: 16px;
+      background-color: var(--editor-bg);
+      color: var(--editor-text);
+      resize: none;
+    }
+
+    #resizer {
+      width: 10px;
+      height: 100%;
+      background: #ccc;
+      cursor: col-resize;
+      flex-shrink: 0;
+    }
+    body.dark #resizer {
+      background: #444;
+    }
+
+    #output-panel {
+      width: 50%;
+      height: 100%;
+    }
+
+    #outputFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: #fff;
+    }
+    body.dark #outputFrame {
+      background-color: #1e1e1e;
+    }
+
+    pre {
+      padding: 15px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .code-html       { color: var(--code-tag); }
+    .code-attr       { color: var(--code-attr); }
+    .code-string     { color: var(--code-string); }
+
+    .output-container {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+
+    body.dark .output-container {
+      background-color: #ffffff12;
+      color: #ffffff;
+    }
+
+    .back-btn {
+      margin: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #04aa6d;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body id="tryit-page" class="light">
+
+  <div class="header">
+    <h1><a href="index.html" class="back-btn" style="text-decoration:none;color:inherit;">&#10094;</a> Try it Yourself</h1>
+    <div>
+      <button onclick="runCode()" class="run-btn">Run &raquo;</button>
+      <button id="themeToggle" class="theme-btn" title="Toggle dark/light mode"><i class="fas fa-circle-half-stroke"></i></button>
+    </div>
+  </div>
+
+  <div class="editor-layout">
+    <div id="editor-panel">
+      <textarea id="codeInput" spellcheck="false">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Page Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h1&gt;This is a Heading&lt;/h1&gt;
+&lt;p&gt;This is a paragraph.&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+      </textarea>
+    </div>
+    <div id="resizer"></div>
+    <div id="output-panel">
+      <iframe id="outputFrame"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      body.classList.toggle('light');
+    });
+
+    function runCode() {
+      const code = document.getElementById('codeInput').value;
+      const iframe = document.getElementById('outputFrame');
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(code);
+      iframeDoc.close();
+    }
+
+    // --- Resizer Logic ---
+    const resizer = document.getElementById('resizer');
+    const editorPanel = document.getElementById('editor-panel');
+    const outputPanel = document.getElementById('output-panel');
+
+    let isResizing = false;
+
+    resizer.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function onMouseMove(e) {
+      if (!isResizing) return;
+      const totalWidth = resizer.parentElement.offsetWidth;
+      const newEditorWidth = e.clientX - resizer.parentElement.offsetLeft;
+      
+      if (newEditorWidth > 100 && newEditorWidth < totalWidth - 100) {
+        editorPanel.style.width = `${newEditorWidth}px`;
+        outputPanel.style.width = `${totalWidth - newEditorWidth - resizer.offsetWidth}px`;
+      }
+    }
+
+    function onMouseUp() {
+      isResizing = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    // Run default code on load
+    window.onload = runCode;
+  </script>
+
+</body>
+</html>
+
